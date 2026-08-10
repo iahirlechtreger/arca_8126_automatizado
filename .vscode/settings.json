@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": [
+        "./arca_8126"
+    ],
+    "python.defaultInterpreterPath": "C:\\Users\\arigr\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+    "python-envs.defaultEnvManager": "ms-python.python:system"
+}
