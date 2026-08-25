@@ -21,8 +21,9 @@ RUTA_CUENTAS = None
 RUTA_MOVIMIENTOS = None
 RUTA_OTROS_INTEGRANTES = None
 
-# ========== RUTA DE SALIDA (cambiar si el archivo se genera en otro lugar) ==========
-RUTA_SALIDA = Path(r"C:\Users\arigr\OneDrive\Desktop\programas chuli\formulario 8126\F8126.30718725840.20260700.0000.txt")
+# ========== RUTA DE SALIDA (se arma solo con el periodo) ==========
+CARPETA_SALIDA = Path(r"C:\Users\arigr\OneDrive\Desktop\programas chuli\formulario 8126")
+RUTA_SALIDA = CARPETA_SALIDA / f"F8126.{CUIT}.{obtener_periodo_anterior()}00.0000.txt"
 
 
 # Arma la lista final de lineas agregando la cantidad de registros a la cabecera
