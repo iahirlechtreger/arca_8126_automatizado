@@ -15,15 +15,14 @@ from arca_8126.movimientos_mensuales import generar_movimientos_con_detalle
 from arca_8126.detalle_movimientos_mensuales import corresponde_detalle
 
 
-# ========== RUTAS DE ENTRADA (cambiar aca cuando haya archivos nuevos) ==========
-CARPETA_DATOS = Path(r"C:\Users\arigr\Downloads")
-RUTA_TITULARES = CARPETA_DATOS / "arca_f8126_30712345689_20260604-06_titulares.csv"
-RUTA_CUENTAS = CARPETA_DATOS / "arca_f8126_30712345689_20260604-06_cuentas.csv"
-RUTA_MOVIMIENTOS = CARPETA_DATOS / "arca_f8126_30712345689_20260604-06_movimientos.csv"
-RUTA_OTROS_INTEGRANTES = Path(r"C:\Users\arigr\OneDrive\Desktop\formulario 8126\datos_otros_integrantes.txt")
+# ========== RUTAS DE ENTRADA (poner la ruta completa del archivo o dejar en None) ==========
+RUTA_TITULARES = None
+RUTA_CUENTAS = None
+RUTA_MOVIMIENTOS = None
+RUTA_OTROS_INTEGRANTES = None
 
 # ========== RUTA DE SALIDA (cambiar si el archivo se genera en otro lugar) ==========
-RUTA_SALIDA = Path(r"C:\Users\arigr\OneDrive\Desktop\formulario 8126\arca_8126\F8126.30718725840.20260600.0000.txt")
+RUTA_SALIDA = Path(r"C:\Users\arigr\OneDrive\Desktop\programas chuli\formulario 8126\F8126.30718725840.20260700.0000.txt")
 
 
 # Arma la lista final de lineas agregando la cantidad de registros a la cabecera
@@ -111,60 +110,62 @@ cabecera = generar_cabecera(CUIT, periodo, hora)
 # Lee el CSV de titulares y genera un registro 02 por cada fila
 titulares = []
 titulares_cuit = []
-with RUTA_TITULARES.open(encoding="utf-8", newline="") as archivo:
-    lector = csv.DictReader(archivo)
-    for fila in lector:
-        datos = parsear_titular_csv(fila)
-        titulares_cuit.append(datos["cuit"])
-        titulares.append(
-            generar_titular_cuenta(
-                tipo=datos["tipo"],
-                origen=datos["origen"],
-                tipo_documento=datos["tipo_documento"],
-                codigo_pais_3=datos["codigo_pais_3"],
-                cuit=datos["cuit"],
-                numero_otro_documento=datos["numero_otro_documento"],
-                nombre=datos["nombre"],
-                id_cuenta_cliente=datos["id_cuenta_cliente"],
-                fecha_alta=datos["fecha_alta"],
-                tipo_operacion=datos["tipo_operacion"],
-                signo_saldo_pesos=datos["signo_saldo_pesos"],
-                saldos_pesos=saldos(datos["saldos_pesos"]),
-                signo_saldo_me=datos["signo_saldo_me"],
-                saldos_me=saldos(datos["saldos_me"]),
-                signo_saldo_mv=datos["signo_saldo_mv"],
-                saldos_mv=saldos(datos["saldos_mv"]),
-                cantidad_cuentas=int(datos["cantidad_cuentas"]),
+if RUTA_TITULARES is not None and RUTA_TITULARES.exists():
+    with RUTA_TITULARES.open(encoding="utf-8", newline="") as archivo:
+        lector = csv.DictReader(archivo)
+        for fila in lector:
+            datos = parsear_titular_csv(fila)
+            titulares_cuit.append(datos["cuit"])
+            titulares.append(
+                generar_titular_cuenta(
+                    tipo=datos["tipo"],
+                    origen=datos["origen"],
+                    tipo_documento=datos["tipo_documento"],
+                    codigo_pais_3=datos["codigo_pais_3"],
+                    cuit=datos["cuit"],
+                    numero_otro_documento=datos["numero_otro_documento"],
+                    nombre=datos["nombre"],
+                    id_cuenta_cliente=datos["id_cuenta_cliente"],
+                    fecha_alta=datos["fecha_alta"],
+                    tipo_operacion=datos["tipo_operacion"],
+                    signo_saldo_pesos=datos["signo_saldo_pesos"],
+                    saldos_pesos=saldos(datos["saldos_pesos"]),
+                    signo_saldo_me=datos["signo_saldo_me"],
+                    saldos_me=saldos(datos["saldos_me"]),
+                    signo_saldo_mv=datos["signo_saldo_mv"],
+                    saldos_mv=saldos(datos["saldos_mv"]),
+                    cantidad_cuentas=int(datos["cantidad_cuentas"]),
+                )
             )
-        )
 
 # Lee el CSV de cuentas y genera un registro 03 por cada fila, agrupadas por titular
 cuentas_por_cuit = {}
-with RUTA_CUENTAS.open(encoding="utf-8", newline="") as archivo_c:
-    for fila_c in csv.DictReader(archivo_c):
-        datos_cuenta = parsear_cuentas_csv(fila_c)
-        cuenta_linea = generar_cuentas_asociadas(
-            tipo_cuenta=datos_cuenta["tipo_cuenta"],
-            cvu_cbu=datos_cuenta["cvu_cbu"],
-            identificador_otro_tipo=datos_cuenta["identificador_otro_tipo"],
-            cantidad_integrantes=int(datos_cuenta["cantidad_integrantes"]),
-            por_orden_terceros=datos_cuenta["por_orden_terceros"],
-            denominacion_tercero=datos_cuenta["denominacion_tercero"],
-            signo_saldo_pesos=datos_cuenta["signo_saldo_pesos"],
-            saldos_pesos=saldos(datos_cuenta["saldos_pesos"]),
-            signo_saldo_me=datos_cuenta["signo_saldo_me"],
-            saldos_me=saldos(datos_cuenta["saldos_me"]),
-            signo_saldo_mv=datos_cuenta["signo_saldo_mv"],
-            saldos_mv=saldos(datos_cuenta["saldos_mv"]),
-            emisor_denominacion=datos_cuenta["emisor_denominacion"],
-        )
-        cuentas_por_cuit.setdefault(datos_cuenta["cuit_titular"], []).append(
-            (datos_cuenta["cvu_cbu"], cuenta_linea)
-        )
+if RUTA_CUENTAS is not None and RUTA_CUENTAS.exists():
+    with RUTA_CUENTAS.open(encoding="utf-8", newline="") as archivo_c:
+        for fila_c in csv.DictReader(archivo_c):
+            datos_cuenta = parsear_cuentas_csv(fila_c)
+            cuenta_linea = generar_cuentas_asociadas(
+                tipo_cuenta=datos_cuenta["tipo_cuenta"],
+                cvu_cbu=datos_cuenta["cvu_cbu"],
+                identificador_otro_tipo=datos_cuenta["identificador_otro_tipo"],
+                cantidad_integrantes=int(datos_cuenta["cantidad_integrantes"]),
+                por_orden_terceros=datos_cuenta["por_orden_terceros"],
+                denominacion_tercero=datos_cuenta["denominacion_tercero"],
+                signo_saldo_pesos=datos_cuenta["signo_saldo_pesos"],
+                saldos_pesos=saldos(datos_cuenta["saldos_pesos"]),
+                signo_saldo_me=datos_cuenta["signo_saldo_me"],
+                saldos_me=saldos(datos_cuenta["saldos_me"]),
+                signo_saldo_mv=datos_cuenta["signo_saldo_mv"],
+                saldos_mv=saldos(datos_cuenta["saldos_mv"]),
+                emisor_denominacion=datos_cuenta["emisor_denominacion"],
+            )
+            cuentas_por_cuit.setdefault(datos_cuenta["cuit_titular"], []).append(
+                (datos_cuenta["cvu_cbu"], cuenta_linea)
+            )
 
-# Lee otros integrantes (si el archivo existe). No se emiten todavia.
+# Lee otros integrantes (si se configuró la ruta). No se emiten todavia.
 otros_integrantes = []
-if RUTA_OTROS_INTEGRANTES.exists():
+if RUTA_OTROS_INTEGRANTES is not None and RUTA_OTROS_INTEGRANTES.exists():
     for fila in RUTA_OTROS_INTEGRANTES.read_text(encoding="utf-8").strip().splitlines():
         if not fila.strip():
             continue
@@ -196,27 +197,28 @@ def parsear_movimientos_csv(fila: dict) -> dict:
 
 # Agrupa por (cvu, tipo, detalle, moneda): la linea con monto genera el 05 y las contrapartes los 06
 grupos = {}
-with RUTA_MOVIMIENTOS.open(encoding="utf-8", newline="") as archivo:
-    lector_mov = csv.DictReader(archivo)
-    for fila in lector_mov:
-        datos_mov = parsear_movimientos_csv(fila)
-        if not datos_mov["cvu"]:
-            continue
-        if datos_mov["detalle_operacion"] not in ("01", "02", "03", "04", "05", "06", "07", "08", "09"):
-            continue
-        clave = (
-            datos_mov["cvu"],
-            datos_mov["tipo_operacion"],
-            datos_mov["detalle_operacion"],
-            datos_mov["moneda_original"],
-        )
-        grupo = grupos.setdefault(clave, {"total": "", "contrapartes": []})
-        if datos_mov["monto_total"]:
-            grupo["total"] = datos_mov["monto_total"]
-        elif datos_mov["cbu_contraparte"]:
-            grupo["contrapartes"].append(
-                {"cbu_contraparte": datos_mov["cbu_contraparte"], "monto_pesos": datos_mov["monto_contraparte"]}
+if RUTA_MOVIMIENTOS is not None and RUTA_MOVIMIENTOS.exists():
+    with RUTA_MOVIMIENTOS.open(encoding="utf-8", newline="") as archivo:
+        lector_mov = csv.DictReader(archivo)
+        for fila in lector_mov:
+            datos_mov = parsear_movimientos_csv(fila)
+            if not datos_mov["cvu"]:
+                continue
+            if datos_mov["detalle_operacion"] not in ("01", "02", "03", "04", "05", "06", "07", "08", "09"):
+                continue
+            clave = (
+                datos_mov["cvu"],
+                datos_mov["tipo_operacion"],
+                datos_mov["detalle_operacion"],
+                datos_mov["moneda_original"],
             )
+            grupo = grupos.setdefault(clave, {"total": "", "contrapartes": []})
+            if datos_mov["monto_total"]:
+                grupo["total"] = datos_mov["monto_total"]
+            elif datos_mov["cbu_contraparte"]:
+                grupo["contrapartes"].append(
+                    {"cbu_contraparte": datos_mov["cbu_contraparte"], "monto_pesos": datos_mov["monto_contraparte"]}
+                )
 
 # Genera los movimientos 05/06 por cuenta (segun el umbral de $50M y el piso por transferencia)
 movimientos = {}
